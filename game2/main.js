@@ -63,7 +63,7 @@ async function choose(value) {
 }
 function finish() {
   $("complete").hidden = false;
-  $("progress").hidden = true; $("stars").hidden = true;
+  document.querySelector(".progress").hidden = true; $("stars").hidden = true;
   $("question").hidden = true; $("choices").hidden = true;
   $("feedback").hidden = true; $("next").hidden = true;
   $("result").textContent = `${questions.length}もん ちゅう ${stars}こ せいかい！`;
