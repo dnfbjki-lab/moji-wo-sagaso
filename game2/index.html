@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e9f7df">
+  <title>えに あう もじを えらぼう！</title>
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+  <main class="game">
+    <a class="back" href="../index.html">◀ TOPにもどる</a>
+    <header><p class="sub">えをみて かんがえよう！</p><h1>えに あう もじを<br>えらぼう！</h1></header>
+    <div class="progress"><span id="progress">1 / 10 もん</span><span id="stars">⭐ 0</span></div>
+    <section class="question" id="question">
+      <div class="picture" id="picture" role="img" aria-label="問題の絵">🦆</div>
+      <p class="instruction">□ に はいる もじは どれかな？</p>
+      <div class="word" id="word">□ひる</div>
+    </section>
+    <div class="choices" id="choices"></div>
+    <p class="feedback" id="feedback" aria-live="polite">もじを えらんでね！</p>
+    <button class="next" id="next" hidden>つぎへ ▶</button>
+    <section class="complete" id="complete" hidden>
+      <div class="trophy">🏆</div><h2>ぜんぶ できたね！</h2>
+      <p id="result"></p><button class="next" id="retry">もういちど あそぶ</button>
+      <a class="back bottom" href="../index.html">TOPにもどる</a>
+    </section>
+  </main>
+  <script src="main.js?v=1"></script>
+</body>
+</html>
