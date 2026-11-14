@@ -4,8 +4,36 @@ let questions = [], questionIndex = 0, stars = 0, streak = 0, locked = false, so
 const shuffle = items => [...items].sort(() => Math.random() - .5);
 function makeQuestion(answer) { return { answer, choices: shuffle([answer, ...shuffle(allKana.filter(k => k !== answer)).slice(0, 3)]) }; }
 function makeStage() { questions = shuffle(allKana).slice(0, 10).map(makeQuestion); questionIndex = 0; streak = 0; locked = false; render(); }
-function speak(text) { if (!soundOn || !('speechSynthesis' in window)) return; window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; u.rate = .82; u.pitch = 1.15; window.speechSynthesis.speak(u); }
-function shell(content) {
+function speak(text) {
+ if (!soundOn || !('speechSynthesis' in window)) return Promise.resolve();
+
+ window.speechSynthesis.cancel();
+
+ return new Promise(resolve => {
+  const u = new SpeechSynthesisUtterance(text);
+  let finished = false;
+
+  const finish = () => {
+   if (finished) return;
+   finished = true;
+   clearTimeout(fallbackTimer);
+   resolve();
+  };
+
+  u.lang = 'ja-JP';
+  u.rate = .82;
+  u.pitch = 1.15;
+  u.onend = finish;
+  u.onerror = finish;
+
+  const fallbackTimer = setTimeout(
+   finish,
+   Math.max(8000, text.length * 900)
+  );
+
+  window.speechSynthesis.speak(u);
+ });
+}function shell(content) {
  app.innerHTML = `<div class="scene"><div class="sun"></div><div class="cloud cloud-a"></div><div class="cloud cloud-b"></div><div class="tree tree-left">🌳</div><div class="tree tree-right">🌳</div><div class="hill hill-back"></div><div class="hill hill-front"></div><header class="topbar"><button class="home-btn" aria-label="ホーム">⌂</button><div class="logo">🌟 もじを <span>さがそう！</span> 🌟</div><div class="score">⭐ <b id="star-count">${stars}</b></div></header>${content}<div class="mascot bear" aria-hidden="true">🐻<span>いっしょに<br>がんばろう！</span></div><div class="mascot bird" aria-hidden="true">🐦</div><div class="mascot bunny" aria-hidden="true">🐰</div><div class="flowers" aria-hidden="true">🌼　🌸　🌼　🌷　🌼</div></div>`;
  app.querySelector('.home-btn').addEventListener('click', showHome);
 }
@@ -25,8 +53,16 @@ function choose(value) {
   buttons.find(b => b.dataset.choice === value).classList.add('correct');
   app.querySelector('#star-count').textContent = String(stars);
   const feedback = app.querySelector('#feedback'); feedback.textContent = streak >= 3 ? '🎉 すごい！ かんぺき！' : '🌟 せいかい！ やったね！'; feedback.classList.add('good');
-  speak('せいかい！ やったね！');
-  setTimeout(() => { questionIndex++; if (questionIndex >= 10) showComplete(); else { locked = false; render(); } }, 1050);
+  speak('せいかい！ やったね！').then(() => {
+  questionIndex++;
+
+  if (questionIndex >= 10) {
+    showComplete();
+  } else {
+    locked = false;
+    render();
+  }
+});
  } else {
   streak = 0; const chosen = buttons.find(b => b.dataset.choice === value); chosen.classList.add('wrong');
   app.querySelector('#feedback').textContent = 'おしい！ もういちど さがしてみよう'; speak('おしい！ もういちど！');
